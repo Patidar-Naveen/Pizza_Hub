@@ -1,6 +1,6 @@
 import express from 'express'
 import mongoose from 'mongoose'
-import  jwt  from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 const jwtSecret = 'kuzuri';
 import user from '../db/CategoryScehma.js'
 import menuSchema from '../db/menuScehma.js'
@@ -9,14 +9,14 @@ const router = express.Router();
 const db = "mongodb://localhost:27017/pizza"
 import nodemailer from 'nodemailer'
 // const nodemailer=require('nodemailer');
-const transporter=nodemailer.createTransport({
-    service:'gmail',
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
     tls: {
         rejectUnauthorized: false
     },
     auth: {
         user: "naveenpatidar3330@gmail.com",
-        pass: "Naveen@251139"
+        pass: ""
     }
 })
 
@@ -60,13 +60,13 @@ router.get("/getpost", (req, res) => {
         }
     })
 })
-router.get("/fetchdata",(req,res)=>{
-    user.find({},(err,data)=>{
-        if(err) throw err;
-        else{
-        res.send(data)
+router.get("/fetchdata", (req, res) => {
+    user.find({}, (err, data) => {
+        if (err) throw err;
+        else {
+            res.send(data)
         }
-       })
+    })
 })
 router.get("/allorders", (req, res) => {
     orderSchema.find({}, (err, data) => {
@@ -82,7 +82,7 @@ router.post('/placeorder', (req, res) => {
         details: req.body.details,
         price: req.body.price,
         status: req.body.status,
-      
+
     })
     console.log(insert2, "line 15")
 
@@ -93,33 +93,32 @@ router.post('/placeorder', (req, res) => {
         }
         else {
             transporter.sendMail({
-            from: 'naveenpatidar3331@gmail.com',
-            to: req.body.details,
-            subject: "order Confirmation",
-            text: "your order is placed"
-        },(error,res)=>{
-            if(error){console.log(error)}else{console.log("mail sent",res)}
-        });
+                from: 'naveenpatidar3331@gmail.com',
+                to: req.body.details,
+                subject: "order Confirmation",
+                text: "your order is placed"
+            }, (error, res) => {
+                if (error) { console.log(error) } else { console.log("mail sent", res) }
+            });
         }
     })
 })
 router.post("/validate", (req, res) => {
-    let email=req.body.email;
-    let password=req.body.password;
-    user.findOne({email:email,password:password},(err,data)=>{
-        if(err){
-            res.json({"err":1,"msg":"Email or password is not correct"})
+    let email = req.body.email;
+    let password = req.body.password;
+    user.findOne({ email: email, password: password }, (err, data) => {
+        if (err) {
+            res.json({ "err": 1, "msg": "Email or password is not correct" })
         }
-        else if(data==null)
-        {
-            res.json({"err":1,"msg":"Email or password is not correct"})
+        else if (data == null) {
+            res.json({ "err": 1, "msg": "Email or password is not correct" })
         }
         else {
-            let payload={
-                uid:email
+            let payload = {
+                uid: email
             }
-            const token=jwt.sign(payload,jwtSecret,{expiresIn:360000})
-            res.json({"err":0,"msg":"Login Success","token":token})
+            const token = jwt.sign(payload, jwtSecret, { expiresIn: 360000 })
+            res.json({ "err": 0, "msg": "Login Success", "token": token })
         }
     })
 })
